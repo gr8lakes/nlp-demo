@@ -39,7 +39,6 @@ def query(id, client):
     comment_data["country"] = country
     comment_data["comment"] = comment
     comment_data["pub_time"] = str(pub_time)
-    
     return comment_data
 
 def inline_text_payload(content):
@@ -64,7 +63,6 @@ def classification_analyze(client, text):
     classification_data = {}
     classification_data["classification_topic"] = topic
     classification_data["classification_score"] = score
-
     return classification_data
 
 # 情感分析函数
@@ -95,8 +93,6 @@ def translate_text(client, text):
     translate_data = {}
     translate_data["translation_text"] = translation_text
     translate_data["source_language"] = source_language
-
-    #print(translate_data)
     return translate_data
 
 # 实体情感分析函数
@@ -141,7 +137,6 @@ def entity_sentiment_analyze(client, text):
         entity_data["salience_score"] = list_entity_salience
         entity_data["entity_sentiment_score"] = list_sentiment_score
         entity_data["entity_sentiment_magnitude"] = list_sentiment_magnitude
-    
     return entity_data
 
 # 转换为json格式的函数
@@ -202,7 +197,7 @@ if __name__ == '__main__':
     nlp_client = language_v1.LanguageServiceClient()
 
     try:
-        # 循环
+        # 循环，对每一条评论进行分析
         for id in range(1, 10):
             # 从BigQuery的原始表格中抽取出评论的文本，按每一条取出
             comment_data = query(id, bq_client)
