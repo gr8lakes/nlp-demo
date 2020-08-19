@@ -21,6 +21,8 @@ def query(id, client):
             bigquery.ScalarQueryParameter("id", "INT64", id)
             ]   
     )
+    
+    # 从项目-数据集-表格中查询数据
     sql = """
         SELECT *
         FROM `webeye-internal-test.cloud_test.origin`
@@ -45,7 +47,9 @@ def inline_text_payload(content):
     return {'text_snippet': {'content': content, 'mime_type': 'text/plain'} }
 
 def classification_analyze(client, text):
+    # 项目id
     project_id = "839062387451"
+    # 模型id
     model_id = "TCN2731224266790928384"
 
     parser = argparse.ArgumentParser()
@@ -53,6 +57,8 @@ def classification_analyze(client, text):
     args = parser.parse_args()
 
     payload = inline_text_payload(args.text_content)
+    
+    # 模型完整的路径
     model_full_id = prediction_client.model_path(project_id, "us-central1", model_id)
             
     response = prediction_client.predict(model_full_id, payload)
