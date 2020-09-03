@@ -6,6 +6,7 @@ import argparse
 import json
 import six
 
+from google.cloud import storage
 from google.cloud import automl
 from decimal import Decimal
 from google.cloud import language_v1
@@ -145,6 +146,26 @@ def annotateText(client, text):
 def convert_json(text):
     return json.dumps(text)
 
+def upload_to_bucket(bucket_name, source_file_name, destination_blob_name):
+    # Instantiates a client
+    storage_client = storage.Client()
+
+    """Uploads a file to the bucket."""
+    # bucket_name = "your-bucket-name"
+    # source_file_name = "local/path/to/file"
+    # destination_blob_name = "storage-object-name"
+
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+
+    blob.upload_from_filename(source_file_name)
+
+    print(
+        "File {} uploaded to {}.".format(
+            source_file_name, destination_blob_name
+        )
+    )
+
 # Import all the returned results into the new table of BigQuery.
 def import_to_bq(client, dataset_id, table_id, filename):
     dataset_ref = client.dataset(dataset_id)
@@ -174,7 +195,7 @@ def import_to_bq(client, dataset_id, table_id, filename):
         job = client.load_table_from_file(source_file, table_ref, job_config=job_config)
 
     # Waits for table load to complete.
-    job.result() 
+    job.result()
 
     print("Loaded {} rows into {}:{}.".format(job.output_rows, dataset_id, table_id))
     return 0
@@ -206,6 +227,10 @@ if __name__ == '__main__':
         print("Error {}".format(err))
     finally:
         g.close()
-        print("Import to BigQuery Table!")
-        import_to_bq(bq_client, "cloud_test", "analyze_data_all", "analyze_results.json")
+        
+        # upload file to gcs
+        upload_to_bucket("test-chent-we/shein", "analyze_results.json", "analyze_results.json")
+        
+        #print("Import to BigQuery Table!")
+        #import_to_bq(bq_client, "cloud_test", "analyze_data_all", "analyze_results.json")
         print("finished!")
